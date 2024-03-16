@@ -16,7 +16,12 @@ void AddMenus(HWND);
 // controls
 void AddControls(HWND);
 
+// file stuff (yuck)
+void OpenFile();
+void SaveFile();
+
 HMENU hMenu;
+HWND hEdit;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE prevInst, LPSTR args, int ncmdshow) {
     
@@ -47,20 +52,19 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE prevInst, LPSTR args, int ncmdshow
 }
 
 LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
+    char text[1024];
 
     switch (msg) {
         case WM_COMMAND:
-
             switch (wp) {
                 case PREF_PLACEHOLDER:
                     MessageBeep(MB_OK);
                     break;
                 case SAVE_FILE:
-                    MessageBox(NULL, "Not yet implemented", "Err", MB_OK);
-                    MessageBeep(MB_YESNO);
+                    GetWindowText(hEdit, text, sizeof(text));
+                    printf(text);
                     break;
-            }
-         
+            }   
             break;
         case WM_CREATE:
             AddMenus(hWnd);
@@ -93,5 +97,13 @@ void AddMenus(HWND hWnd) {
 }
 
 void AddControls(HWND hWnd) {
-    CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | ES_AUTOVSCROLL | ES_MULTILINE, 0, 0, WINDOW_W, WINDOW_H, hWnd, NULL, NULL, NULL);
+    hEdit = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | ES_AUTOVSCROLL | ES_MULTILINE, 0, 0, WINDOW_W, WINDOW_H, hWnd, NULL, NULL, NULL);
+}
+
+void OpenFile() {
+
+}
+
+void SaveFile() {
+
 }
