@@ -69,7 +69,7 @@ LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
                     MessageBox(hWnd, "File Saved", "Notification", MB_OK);
                     break;
                 case OPEN_FILE:
-                    openF(hWnd);
+                    MessageBeep(MB_OK);
                     break;
             }   
             break;
