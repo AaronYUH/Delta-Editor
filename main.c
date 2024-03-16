@@ -20,13 +20,13 @@ void AddControls(HWND);
 
 // file stuff (yuck)
 void openF(HWND); // save for later very issue
-void saveF();
+void saveF(char[]);
 
 HMENU hMenu;
 HWND hEdit;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE prevInst, LPSTR args, int ncmdshow) {
-    
+    ncmdshow = 0;
     // struct
     WNDCLASSW xd = {0};
 
@@ -65,6 +65,8 @@ LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
                 case SAVE_FILE:
                     GetWindowText(hEdit, text, sizeof(text));
                     printf(text);
+                    saveF(text);
+                    MessageBox(hWnd, "File Saved", "Notification", MB_OK);
                     break;
                 case OPEN_FILE:
                     openF(hWnd);
@@ -110,6 +112,11 @@ void openF(HWND hWnd) {
     return;
 }
 
-void saveF() {
+void saveF(char text[]) {
+    FILE *fptr;
 
+    fptr = fopen("main.txt", "w");
+
+    fprintf(fptr, text);
+    fclose(fptr);
 }
