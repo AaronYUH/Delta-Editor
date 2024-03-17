@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <windows.h>
-#include <commdlg.h>
-
 
 #define SAVE_FILE 0
 #define PREF_PLACEHOLDER 1
 #define CLEAR_FILE 2
 #define OPEN_FILE 3
+#define EXIT_APP 4
 
 // window procedure
 LRESULT CALLBACK xdProcedure(HWND, UINT, WPARAM, LPARAM);
@@ -47,6 +46,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE prevInst, LPSTR args, int ncmdshow
 
     CreateWindowW(L"deltaProject", L"Delta", WS_OVERLAPPEDWINDOW | WS_VISIBLE , 0, 0, winWidth, winHeight, NULL, NULL, NULL, NULL);
 
+    HINSTANCE relib = LoadLibrary("riched32.dll");
+
+    if (relib == NULL)
+        MessageBox(NULL, "couldn't load richedit32.dll", "", MB_ICONEXCLAMATION);
+
     // struct
     MSG msg = {0};
 
@@ -61,12 +65,13 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE prevInst, LPSTR args, int ncmdshow
 
 LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     char text[1024];
+    int closeMsg;
 
     switch (msg) {
         case WM_COMMAND:
             switch (wp) {
                 case PREF_PLACEHOLDER:
-                    MessageBeep(MB_OK);
+                    MessageBox(hWnd, "Not yet implemented.", "Alert", MB_OK);
                     break;
                 case SAVE_FILE:
                     GetWindowText(hEdit, text, sizeof(text));
@@ -77,9 +82,20 @@ LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
                 case CLEAR_FILE:
                     clearF(hEdit);
                     MessageBox(hWnd, "File Cleared", "Notification", MB_OK);
-                case OPEN_FILE:
-                    MessageBeep(MB_OK);
                     break;
+                case OPEN_FILE:
+                    MessageBox(hWnd, "Not yet implemented.", "Alert", MB_OK);
+                    break;
+                case EXIT_APP:
+                    closeMsg = MessageBox(hWnd, "Are you sure?", "Confirm", MB_OKCANCEL);
+                    switch(closeMsg) {
+                        case IDCANCEL:
+                            return;
+                            break;
+                        case IDOK:
+                            DestroyWindow(hWnd);
+                            break;
+                    }
             }   
             break;
         case WM_CREATE:
@@ -105,11 +121,13 @@ void AddMenus(HWND hWnd) {
     AppendMenu(hMenu, MF_POPUP, (UINT_PTR) hFileMenu, "File");
     AppendMenu(hMenu, MF_STRING, PREF_PLACEHOLDER, "Preferences");
 
-    // preference menu
+    // file menu
     {
         AppendMenu(hFileMenu, MF_STRING, SAVE_FILE, "Save");
         AppendMenu(hFileMenu, MF_STRING, OPEN_FILE, "Open");
         AppendMenu(hFileMenu, MF_STRING, CLEAR_FILE, "Clear");
+        AppendMenu(hFileMenu, MFT_SEPARATOR, NULL, NULL);
+        AppendMenu(hFileMenu, MF_STRING, EXIT_APP, "Exit");
     }
 
     SetMenu(hWnd, hMenu);
@@ -147,3 +165,4 @@ void adjustSize(HWND hWnd) {
         SetWindowPos(hEdit, NULL, 0, 0, w, h, SWP_NOMOVE);
     }
 }
+
