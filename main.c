@@ -2,8 +2,7 @@
 #include <windows.h>
 #include <commdlg.h>
 
-#define WINDOW_W 500
-#define WINDOW_H 500
+
 #define SAVE_FILE 0
 #define PREF_PLACEHOLDER 1
 #define CLEAR_FILE 2
@@ -23,8 +22,14 @@ void openF(HWND); // save for later very issue
 void saveF(char[]);
 void clearF(HWND);
 
+// accesibility?
+void adjustSize(HWND);
+
 HMENU hMenu;
 HWND hEdit;
+
+int winWidth = 500;
+int winHeight = 500;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE prevInst, LPSTR args, int ncmdshow) {
     ncmdshow = 0;
@@ -40,7 +45,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE prevInst, LPSTR args, int ncmdshow
     if (!(RegisterClassW(&xd)))
         return -1;
 
-    CreateWindowW(L"deltaProject", L"Delta", WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE , 0, 0, WINDOW_W, WINDOW_H, NULL, NULL, NULL, NULL);
+    CreateWindowW(L"deltaProject", L"Delta", WS_OVERLAPPEDWINDOW | WS_VISIBLE , 0, 0, winWidth, winHeight, NULL, NULL, NULL, NULL);
 
     // struct
     MSG msg = {0};
@@ -81,6 +86,9 @@ LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
             AddMenus(hWnd);
             AddControls(hWnd);
             break;
+        case WM_SIZE:
+            adjustSize(hWnd);
+            break;
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
@@ -109,7 +117,7 @@ void AddMenus(HWND hWnd) {
 }
 
 void AddControls(HWND hWnd) {
-    hEdit = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | ES_AUTOVSCROLL | ES_MULTILINE, 0, 0, WINDOW_W, WINDOW_H, hWnd, NULL, NULL, NULL);
+    hEdit = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | ES_AUTOVSCROLL | ES_MULTILINE, 0, 0, winWidth, winHeight, hWnd, NULL, NULL, NULL);
 }
 
 void openF(HWND hWnd) {
@@ -127,4 +135,15 @@ void saveF(char text[]) {
 
 void clearF(HWND hWnd) {
     SetWindowText(hWnd, "");
+}
+
+void adjustSize(HWND hWnd) {
+    RECT r;
+
+    if (GetWindowRect(hWnd, &r)) {
+        int w = r.right - r.left;
+        int h = r.bottom - r.top;
+        
+        SetWindowPos(hEdit, NULL, 0, 0, w, h, SWP_NOMOVE);
+    }
 }
