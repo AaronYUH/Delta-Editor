@@ -21,6 +21,7 @@ void AddControls(HWND);
 // file stuff (yuck)
 void openF(HWND); // save for later very issue
 void saveF(char[]);
+void clearF(HWND);
 
 HMENU hMenu;
 HWND hEdit;
@@ -68,6 +69,9 @@ LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
                     saveF(text);
                     MessageBox(hWnd, "File Saved", "Notification", MB_OK);
                     break;
+                case CLEAR_FILE:
+                    clearF(hEdit);
+                    MessageBox(hWnd, "File Cleared", "Notification", MB_OK);
                 case OPEN_FILE:
                     MessageBeep(MB_OK);
                     break;
@@ -91,7 +95,7 @@ void AddMenus(HWND hWnd) {
     hMenu = CreateMenu();
     HMENU hFileMenu = CreateMenu();
     AppendMenu(hMenu, MF_POPUP, (UINT_PTR) hFileMenu, "File");
-    AppendMenu(hMenu, MF_STRING, 0, "Preferences");
+    AppendMenu(hMenu, MF_STRING, PREF_PLACEHOLDER, "Preferences");
 
     // preference menu
     {
@@ -119,4 +123,8 @@ void saveF(char text[]) {
 
     fprintf(fptr, text);
     fclose(fptr);
+}
+
+void clearF(HWND hWnd) {
+    SetWindowText(hWnd, "");
 }
