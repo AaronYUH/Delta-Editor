@@ -102,7 +102,6 @@ LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         case WM_COMMAND:
             switch (wp) {
                 case PREF_PLACEHOLDER:
-                    ShowWindow(hPref, 0);
                     break;
                 case SAVE_FILE:
                     GetWindowText(hEdit, text, sizeof(text));
