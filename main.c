@@ -9,12 +9,14 @@
 
 // window procedure
 LRESULT CALLBACK xdProcedure(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK ydProcedure(HWND, UINT, WPARAM, LPARAM);
 
 // menus
 void AddMenus(HWND);
 
 // controls
 void AddControls(HWND);
+void AddControlsPref(HWND);
 
 // file stuff (yuck)
 void openF(HWND); // save for later very issue
@@ -26,6 +28,8 @@ void adjustSize(HWND);
 
 HMENU hMenu;
 HWND hEdit;
+HWND hParent;
+HWND hPref;
 
 int winWidth = 500;
 int winHeight = 500;
@@ -44,7 +48,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE prevInst, LPSTR args, int ncmdshow
     if (!(RegisterClassW(&xd)))
         return -1;
 
-    CreateWindowW(L"deltaProject", L"Delta", WS_OVERLAPPEDWINDOW | WS_VISIBLE , 0, 0, winWidth, winHeight, NULL, NULL, NULL, NULL);
+    hParent = CreateWindowW(L"deltaProject", L"Delta", WS_OVERLAPPEDWINDOW | WS_VISIBLE , 0, 0, winWidth, winHeight, NULL, NULL, NULL, NULL);
 
     HINSTANCE relib = LoadLibrary("riched32.dll");
 
@@ -60,6 +64,33 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE prevInst, LPSTR args, int ncmdshow
         DispatchMessage(&msg);
     }
 
+    /* 
+        Creating Preference Window
+    */
+
+   // struct
+    WNDCLASSW yd = {0};
+
+    yd.hbrBackground = (HBRUSH)COLOR_WINDOW;
+    yd.hCursor = LoadCursor(NULL, IDC_ARROW);
+    yd.hInstance = hInst;
+    yd.lpszClassName = L"prefWin";
+    yd.lpfnWndProc = ydProcedure;
+
+    if (!(RegisterClassW(&yd)))
+        return -1;
+
+    hPref = CreateWindowW(L"prefWin", L"Preferences", WS_OVERLAPPEDWINDOW | WS_VISIBLE , 0, 0, 400, 400, hParent, NULL, NULL, NULL);
+
+    // struct
+    MSG msgx = {0};
+
+    // window loop
+    while (GetMessage(&msgx, NULL, NULL, NULL)) {
+        TranslateMessage(&msgx);
+        DispatchMessage(&msgx);
+    }
+
     return 0;
 }
 
@@ -71,7 +102,7 @@ LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         case WM_COMMAND:
             switch (wp) {
                 case PREF_PLACEHOLDER:
-                    MessageBox(hWnd, "Not yet implemented.", "Alert", MB_OK);
+                    ShowWindow(hPref, 0);
                     break;
                 case SAVE_FILE:
                     GetWindowText(hEdit, text, sizeof(text));
@@ -115,6 +146,21 @@ LRESULT CALLBACK xdProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 }
 
+LRESULT CALLBACK ydProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
+    switch (msg) {
+        case WM_CREATE:
+            AddControlsPref(hWnd);
+            break;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+        default:
+            return DefWindowProcW(hWnd, msg, wp, lp);
+            break;
+    }
+
+}
+
 void AddMenus(HWND hWnd) {
     hMenu = CreateMenu();
     HMENU hFileMenu = CreateMenu();
@@ -136,6 +182,10 @@ void AddMenus(HWND hWnd) {
 
 void AddControls(HWND hWnd) {
     hEdit = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | ES_AUTOVSCROLL | ES_MULTILINE, 0, 0, winWidth, winHeight, hWnd, NULL, NULL, NULL);
+}
+
+void AddControlsPref(HWND hWnd) {
+    CreateWindowW(L"Button", L"Wow", WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 0, 100, 50, hWnd, NULL, NULL, NULL);
 }
 
 void openF(HWND hWnd) {
